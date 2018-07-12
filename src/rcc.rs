@@ -45,7 +45,7 @@ pub struct Rcc {
 
 /// AMBA High-performance Bus 1 (AHB1) register
 pub struct AHB1 {
-    _0: (),   
+    _0: (),
 }
 
 impl AHB1 {
@@ -70,7 +70,7 @@ impl AHB1 {
 
 /// AMBA High-performance Bus 2 (AHB2) register
 pub struct AHB2 {
-    _0: (),   
+    _0: (),
 }
 
 impl AHB2 {
@@ -95,7 +95,7 @@ impl AHB2 {
 
 /// AMBA High-performance Bus 3 (AHB3) register
 pub struct AHB3 {
-    _0: (),   
+    _0: (),
 }
 
 impl AHB3 {
@@ -120,7 +120,7 @@ impl AHB3 {
 
 /// Advanced Peripheral Bus 1 (APB1) registers
 pub struct APB1 {
-    _0: (),   
+    _0: (),
 }
 
 impl APB1 {
@@ -145,7 +145,7 @@ impl APB1 {
 
 /// Advanced Peripheral Bus 2 (APB2) registers
 pub struct APB2 {
-    _0: (),   
+    _0: (),
 }
 
 impl APB2 {
@@ -169,7 +169,7 @@ impl APB2 {
 }
 
 /// Clock source to use. HSI is the internal low-precision source at 16 MHz. HSE is an external
-/// clock source between 4-26 MHz fed into OSC_IN. 
+/// clock source between 4-26 MHz fed into OSC_IN.
 pub enum ClockSource {
     HSI,
     HSE(Hertz),
@@ -241,12 +241,10 @@ impl CFGRBuilder {
 
                 (vco * pll_n) / pll_p
             }
-            None => {
-                match self.source {
-                    ClockSource::HSI => 16_000_000,
-                    ClockSource::HSE(freq) => freq.0,
-                }
-            }
+            None => match self.source {
+                ClockSource::HSI => 16_000_000,
+                ClockSource::HSE(freq) => freq.0,
+            },
         };
 
         // Set AHB divisor
@@ -254,12 +252,12 @@ impl CFGRBuilder {
             let ahb_prescale = self.ahb_prescale.unwrap_or(1);
 
             let ahb_prescale_bits = match ahb_prescale {
-                1 =>   0b0000,
-                2 =>   0b1000,
-                4 =>   0b1001,
-                8 =>   0b1010,
-                16 =>  0b1011,
-                64 =>  0b1100,
+                1 => 0b0000,
+                2 => 0b1000,
+                4 => 0b1001,
+                8 => 0b1010,
+                16 => 0b1011,
+                64 => 0b1100,
                 128 => 0b1101,
                 256 => 0b1110,
                 512 => 0b1111,
@@ -274,7 +272,8 @@ impl CFGRBuilder {
             // AHB Max speed is 168 MHz
             assert!(hclk_freq <= 168_000_000);
 
-            rcc.cfgr.write(|w| unsafe { w.hpre().bits(ahb_prescale_bits) });
+            rcc.cfgr
+                .write(|w| unsafe { w.hpre().bits(ahb_prescale_bits) });
 
             hclk_freq
         };
@@ -284,11 +283,11 @@ impl CFGRBuilder {
             let apb1_prescale = self.apb1_prescale.unwrap_or(1);
 
             let apb1_prescale_bits = match apb1_prescale {
-                1 =>   0b000,
-                2 =>   0b100,
-                4 =>   0b101,
-                8 =>   0b110,
-                16 =>  0b111,
+                1 => 0b000,
+                2 => 0b100,
+                4 => 0b101,
+                8 => 0b110,
+                16 => 0b111,
                 _ => panic!("Invalid apb1_prescale value (PPRE1)"),
             };
 
@@ -297,7 +296,8 @@ impl CFGRBuilder {
             // APB low speed clock must not exceed 42 MHz
             assert!(apb1_freq <= 42_000_000);
 
-            rcc.cfgr.write(|w| unsafe { w.ppre1().bits(apb1_prescale_bits) });
+            rcc.cfgr
+                .write(|w| unsafe { w.ppre1().bits(apb1_prescale_bits) });
 
             (apb1_freq, apb1_prescale as u8)
         };
@@ -307,11 +307,11 @@ impl CFGRBuilder {
             let apb2_prescale = self.apb2_prescale.unwrap_or(1);
 
             let apb2_prescale_bits = match apb2_prescale {
-                1 =>   0b000,
-                2 =>   0b100,
-                4 =>   0b101,
-                8 =>   0b110,
-                16 =>  0b111,
+                1 => 0b000,
+                2 => 0b100,
+                4 => 0b101,
+                8 => 0b110,
+                16 => 0b111,
                 _ => panic!("Invalid apb2_prescale value (PPRE2)"),
             };
 
@@ -320,7 +320,8 @@ impl CFGRBuilder {
             // APB low speed clock must not exceed 84 MHz
             assert!(apb2_freq <= 84_000_000);
 
-            rcc.cfgr.write(|w| unsafe { w.ppre1().bits(apb2_prescale_bits) });
+            rcc.cfgr
+                .write(|w| unsafe { w.ppre1().bits(apb2_prescale_bits) });
 
             (apb2_freq, apb2_prescale as u8)
         };
@@ -337,7 +338,8 @@ impl CFGRBuilder {
                 w.latency().bits(0b011)
             } else if hclk_freq <= 150_000_000 {
                 w.latency().bits(0b100)
-            } else { // hclk_freq <= 168_000_000
+            } else {
+                // hclk_freq <= 168_000_000
                 w.latency().bits(0b101)
             }
         });
@@ -374,10 +376,11 @@ impl CFGRBuilder {
             };
 
             // Set pll coefficients
-            rcc.pllcfgr.write(|w| unsafe{ w.pllm().bits(pll_m as u8) });
-            rcc.pllcfgr.write(|w| unsafe{ w.plln().bits(pll_n as u16) });
-            rcc.pllcfgr.write(|w| unsafe{ w.pllp().bits(pll_p_bits) });
-            rcc.pllcfgr.write(|w| unsafe{ w.pllq().bits(pll_q as u8) });
+            rcc.pllcfgr.write(|w| unsafe { w.pllm().bits(pll_m as u8) });
+            rcc.pllcfgr
+                .write(|w| unsafe { w.plln().bits(pll_n as u16) });
+            rcc.pllcfgr.write(|w| unsafe { w.pllp().bits(pll_p_bits) });
+            rcc.pllcfgr.write(|w| unsafe { w.pllq().bits(pll_q as u8) });
 
             // Set PLL as clock source
             rcc.cfgr.write(|w| w.sw().pll());
@@ -385,7 +388,7 @@ impl CFGRBuilder {
             // Set either HSI or HSE as clock source
             match self.source {
                 ClockSource::HSI => rcc.cfgr.write(|w| w.sw().hsi()),
-                ClockSource::HSE(_) => rcc.cfgr.write(|w| w.sw().hse()), 
+                ClockSource::HSE(_) => rcc.cfgr.write(|w| w.sw().hse()),
             }
         }
 

@@ -1,6 +1,6 @@
 use cast::u32;
-use cortex_m::peripheral::SYST;
 use cortex_m::peripheral::syst::SystClkSource;
+use cortex_m::peripheral::SYST;
 
 use hal::blocking::delay::{DelayMs, DelayUs};
 use rcc::Clocks;
@@ -16,10 +16,7 @@ impl Delay {
     pub fn new(mut syst: SYST, clocks: Clocks) -> Self {
         syst.set_clock_source(SystClkSource::Core);
 
-        Delay {
-            clocks,
-            syst,
-        }
+        Delay { clocks, syst }
     }
 
     /// Releases the system timer (SysTick) resource
@@ -55,7 +52,7 @@ impl DelayUs<u32> for Delay {
         self.syst.set_reload(rvr);
         self.syst.clear_current();
         self.syst.enable_counter();
-        
+
         while !self.syst.has_wrapped() {}
 
         self.syst.disable_counter();

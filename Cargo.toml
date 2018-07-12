@@ -1,17 +1,23 @@
 [package]
 name = "stm32f40x-hal"
-version = "0.1.0"
-authors = ["Warren <wanrunhu@gmail.com>"]
+version = "0.2.0"
+authors = ["Warren <wanrunhu@gmail.com>",
+           "Henrik Tjäder <henrik@tjaders.com>"]
 categories = ["embedded", "hardware-support", "no-std"]
-keywords = ["arm", "cortex-m", "stm32", "hal, embedded-hal-impl"]
+keywords = ["arm", "cortex-m", "stm32", "hal", "embedded-hal-impl"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/keringar/stm32f40x-hal"
+repository = "https://github.com/AfoHT/stm32f40x-hal"
 
 [dependencies]
 stm32f40x = { path="../stm32f40x-rs" }
-cortex-m = "0.4.3"
-embedded-hal = "0.1.1"
-nb = "0.1.1"
+cortex-m = "0.5.0"
+embedded-hal = "0.2.0"
+nb = "0.1.0"
+
+
+[dependencies.void]
+default-features = false
+version = "1.0.2"
 
 [dependencies.cast]
 default-features = false

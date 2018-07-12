@@ -1,45 +1,89 @@
-//! General Purpose Input/Output
+//! General Purpose Input / Output
+
+// TODO the pins here currently correspond to the LQFP-100 package. There should be Cargo features
+// that let you select different microcontroller packages
 
 use core::marker::PhantomData;
 
 use rcc::AHB1;
 
+/// Extension trait to split a GPIO peripheral in independent pins and registers
 pub trait GpioExt {
+    /// The to split the GPIO into
     type Parts;
 
+    /// Splits the GPIO block into independent pins and registers
     fn split(self, ahb: &mut AHB1) -> Self::Parts;
 }
 
+/// Input mode (type state)
 pub struct Input<MODE> {
     _mode: PhantomData<MODE>,
 }
 
+/// Floating input (type state)
 pub struct Floating;
+/// Pulled down input (type state)
 pub struct PullDown;
+/// Pulled up input (type state)
 pub struct PullUp;
 
+/// Output mode (type state)
 pub struct Output<MODE> {
     _mode: PhantomData<MODE>,
 }
 
+/// Push pull output (type state)
 pub struct PushPull;
+/// Open drain output (type state)
 pub struct OpenDrain;
 
+/// Alternate function 0 (type state)
 pub struct AF0;
+
+/// Alternate function 1 (type state)
 pub struct AF1;
+
+/// Alternate function 2 (type state)
 pub struct AF2;
+
+/// Alternate function 3 (type state)
 pub struct AF3;
+
+/// Alternate function 4 (type state)
 pub struct AF4;
+
+/// Alternate function 5 (type state)
 pub struct AF5;
+
+/// Alternate function 6 (type state)
 pub struct AF6;
+
+/// Alternate function 7 (type state)
 pub struct AF7;
+
+/// Alternate function 8 (type state)
 pub struct AF8;
+
+/// Alternate function 9 (type state)
 pub struct AF9;
+
+/// Alternate function 10 (type state)
 pub struct AF10;
+
+/// Alternate function 11 (type state)
 pub struct AF11;
+
+/// Alternate function 12 (type state)
 pub struct AF12;
+
+/// Alternate function 13 (type state)
 pub struct AF13;
+
+/// Alternate function 14 (type state)
 pub struct AF14;
+
+/// Alternate function 15 (type state)
 pub struct AF15;
 
 macro_rules! gpio {
@@ -160,15 +204,6 @@ macro_rules! gpio {
             }
 
             impl<MODE> OutputPin for $PXx<Output<MODE>> {
-                fn is_high(&self) -> bool {
-                    !self.is_low()
-                }
-
-                fn is_low(&self) -> bool {
-                    // NOTE(unsafe) atomic read with no side effects
-                    unsafe { (*$GPIOX::ptr()).odr.read().bits() & (1 << self.i) == 0 }
-                }
-
                 fn set_high(&mut self) {
                     // NOTE(unsafe) atomic write to a stateless register
                     unsafe { (*$GPIOX::ptr()).bsrr.write(|w| w.bits(1 << self.i)) }
@@ -419,15 +454,6 @@ macro_rules! gpio {
                 }
 
                 impl<MODE> OutputPin for $PXi<Output<MODE>> {
-                    fn is_high(&self) -> bool {
-                        !self.is_low()
-                    }
-
-                    fn is_low(&self) -> bool {
-                        // NOTE(unsafe) atomic read with no side effects
-                        unsafe { (*$GPIOX::ptr()).odr.read().bits() & (1 << $i) == 0 }
-                    }
-
                     fn set_high(&mut self) {
                         // NOTE(unsafe) atomic write to a stateless register
                         unsafe { (*$GPIOX::ptr()).bsrr.write(|w| w.bits(1 << $i)) }
@@ -519,4 +545,99 @@ gpio!(GPIOD, gpiod, gpiod, gpioden, gpiodrst, PDx, [
     PD13: (pd13, 13, Input<Floating>, AFRH),
     PD14: (pd14, 14, Input<Floating>, AFRH),
     PD15: (pd15, 15, Input<Floating>, AFRH),
+]);
+
+gpio!(GPIOE, gpioe, gpioe, gpioeen, gpioerst, PEx, [
+    PE0: (pe0, 0, Input<Floating>, AFRL),
+    PE1: (pe1, 1, Input<Floating>, AFRL),
+    PE2: (pe2, 2, Input<Floating>, AFRL),
+    PE3: (pe3, 3, Input<Floating>, AFRL),
+    PE4: (pe4, 4, Input<Floating>, AFRL),
+    PE5: (pe5, 5, Input<Floating>, AFRL),
+    PE6: (pe6, 6, Input<Floating>, AFRL),
+    PE7: (pe7, 7, Input<Floating>, AFRL),
+    PE8: (pe8, 8, Input<Floating>, AFRH),
+    PE9: (pe9, 9, Input<Floating>, AFRH),
+    PE10: (pe10, 10, Input<Floating>, AFRH),
+    PE11: (pe11, 11, Input<Floating>, AFRH),
+    PE12: (pe12, 12, Input<Floating>, AFRH),
+    PE13: (pe13, 13, Input<Floating>, AFRH),
+    PE14: (pe14, 14, Input<Floating>, AFRH),
+    PE15: (pe15, 15, Input<Floating>, AFRH),
+]);
+
+gpio!(GPIOF, gpiof, gpiof, gpiofen, gpiofrst, PFx, [
+    PF0: (pf0, 0, Input<Floating>, AFRL),
+    PF1: (pf1, 1, Input<Floating>, AFRL),
+    PF2: (pf2, 2, Input<Floating>, AFRL),
+    PF3: (pf3, 3, Input<Floating>, AFRL),
+    PF4: (pf4, 4, Input<Floating>, AFRL),
+    PF5: (pf5, 5, Input<Floating>, AFRL),
+    PF6: (pf6, 6, Input<Floating>, AFRL),
+    PF7: (pf7, 7, Input<Floating>, AFRL),
+    PF8: (pf8, 8, Input<Floating>, AFRH),
+    PF9: (pf9, 9, Input<Floating>, AFRH),
+    PF10: (pf10, 10, Input<Floating>, AFRH),
+    PF11: (pf11, 11, Input<Floating>, AFRH),
+    PF12: (pf12, 12, Input<Floating>, AFRH),
+    PF13: (pf13, 13, Input<Floating>, AFRH),
+    PF14: (pf14, 14, Input<Floating>, AFRH),
+    PF15: (pf15, 15, Input<Floating>, AFRH),
+]);
+
+gpio!(GPIOG, gpiog, gpiog, gpiogen, gpiogrst, PGx, [
+    PG0: (pg0, 0, Input<Floating>, AFRL),
+    PG1: (pg1, 1, Input<Floating>, AFRL),
+    PG2: (pg2, 2, Input<Floating>, AFRL),
+    PG3: (pg3, 3, Input<Floating>, AFRL),
+    PG4: (pg4, 4, Input<Floating>, AFRL),
+    PG5: (pg5, 5, Input<Floating>, AFRL),
+    PG6: (pg6, 6, Input<Floating>, AFRL),
+    PG7: (pg7, 7, Input<Floating>, AFRL),
+    PG8: (pg8, 8, Input<Floating>, AFRH),
+    PG9: (pg9, 9, Input<Floating>, AFRH),
+    PG10: (pg10, 10, Input<Floating>, AFRH),
+    PG11: (pg11, 11, Input<Floating>, AFRH),
+    PG12: (pg12, 12, Input<Floating>, AFRH),
+    PG13: (pg13, 13, Input<Floating>, AFRH),
+    PG14: (pg14, 14, Input<Floating>, AFRH),
+    PG15: (pg15, 15, Input<Floating>, AFRH),
+]);
+
+gpio!(GPIOH, gpioh, gpioh, gpiohen, gpiohrst, PHx, [
+    PH0: (ph0, 0, Input<Floating>, AFRL),
+    PH1: (ph1, 1, Input<Floating>, AFRL),
+    PH2: (ph2, 2, Input<Floating>, AFRL),
+    PH3: (ph3, 3, Input<Floating>, AFRL),
+    PH4: (ph4, 4, Input<Floating>, AFRL),
+    PH5: (ph5, 5, Input<Floating>, AFRL),
+    PH6: (ph6, 6, Input<Floating>, AFRL),
+    PH7: (ph7, 7, Input<Floating>, AFRL),
+    PH8: (ph8, 8, Input<Floating>, AFRH),
+    PH9: (ph9, 9, Input<Floating>, AFRH),
+    PH10: (ph10, 10, Input<Floating>, AFRH),
+    PH11: (ph11, 11, Input<Floating>, AFRH),
+    PH12: (ph12, 12, Input<Floating>, AFRH),
+    PH13: (ph13, 13, Input<Floating>, AFRH),
+    PH14: (ph14, 14, Input<Floating>, AFRH),
+    PH15: (ph15, 15, Input<Floating>, AFRH),
+]);
+
+gpio!(GPIOI, gpioi, gpioi, gpioien, gpioirst, PIx, [
+    PI0: (pi0, 0, Input<Floating>, AFRL),
+    PI1: (pi1, 1, Input<Floating>, AFRL),
+    PI2: (pi2, 2, Input<Floating>, AFRL),
+    PI3: (pi3, 3, Input<Floating>, AFRL),
+    PI4: (pi4, 4, Input<Floating>, AFRL),
+    PI5: (pi5, 5, Input<Floating>, AFRL),
+    PI6: (pi6, 6, Input<Floating>, AFRL),
+    PI7: (pi7, 7, Input<Floating>, AFRL),
+    PI8: (pi8, 8, Input<Floating>, AFRH),
+    PI9: (pi9, 9, Input<Floating>, AFRH),
+    PI10: (pi10, 10, Input<Floating>, AFRH),
+    PI11: (pi11, 11, Input<Floating>, AFRH),
+    PI12: (pi12, 12, Input<Floating>, AFRH),
+    PI13: (pi13, 13, Input<Floating>, AFRH),
+    PI14: (pi14, 14, Input<Floating>, AFRH),
+    PI15: (pi15, 15, Input<Floating>, AFRH),
 ]);

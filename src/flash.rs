@@ -33,4 +33,3 @@ impl ACR {
         unsafe { &(*FLASH::ptr()).acr }
     }
 }
-
