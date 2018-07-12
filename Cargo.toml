@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/AfoHT/stm32f40x-hal"
 
 [dependencies]
-stm32f40x = { path="../stm32f40x-rs" }
+stm32f40x = { git="https://github.com/AfoHT/stm32f40x-rs" }
 cortex-m = "0.5.0"
 embedded-hal = "0.2.0"
 nb = "0.1.0"
